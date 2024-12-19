@@ -1,4 +1,4 @@
-# Training LocalTreinamento - NomeDoTreinamento
+# Training Alura - PostgreSQL
 
 ## Estrutura do Repositório
 
@@ -24,5 +24,5 @@
 │   ├── NomeArquivo5.pdf
 ├── LICENSE
 ├── README.md
-├── Training-NomeDoTreinamento.md
+├── Training-PostgreSQL.md
 └── learning_notes.md
