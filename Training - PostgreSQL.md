@@ -1,4 +1,4 @@
-# Alura - PostgreSQL: Primeiros passos com SQL.
+# Alura - PostgreSQL: Primeiros passos com SQL
 
 ### **Instrutor**: Diogo Mascarenhas
 ### **Linkedin**: [Perfil do LinkeIn](ColeAquiLinkPaginaPerfilLinkedinInstrutor)
@@ -11,22 +11,89 @@
 
 Esta jornada destina-se a obter uma introdução às principais funções que podemos utilizar nesse poderoso banco de dados relacional open source.
 
-## Os tópicos que iremos abordar nesse curso serão
+Ao final do treinamento deveremos ser capaz de:
 
-- Instalação do PostgreeSQL (versão 12) e pgAdmin (versão 4);
-- Como criar e excluir um banco de dados;
-- Criação de tabelas dentro do banco de dados;
-- Inclusão, alteração e exclusão de registros dentro das tabelas;
-- Como fazer consultas em um banco de dados;
-- Quais são os tipos de dados;
-- Filtragem de dados com os operadores e e ou;
-- Junção nas consultas de dados (Joins, Left, Right, Full< Cross);
-- Chaves primárias e chaves estrangeiras;
-- Restrições usando restrict e deleção de dados de outras tabelas com cascade;
-- Como ordenar ou limitar as consultas;
-- Agrupamento de dados;
-- Análise e operações de dados;
-- Elaboração de filtros para os agrupamentos.
+- Crie a estrutura de uma tabela com CREATE TABLE
+- Realize consultas com SELECT
+- Adicione dados no banco com o INSERT
+- Atualize e apague dados com UPDATE e DELETE
+- Filtre os seus registros com WHERE
+- Ordene os seus dados com o ORDER BY
+- Junte registros de tabelas com JOIN
+
+---
+
+## Aulas
+
+- Primeiros passos com PostgreSQL
+  - Apresentação do curso
+  - Ambiente e versões
+  - Criando um banco de dados
+  - Criação e exclusão de um banco de dados
+  - Criando uma tabela
+  - Tabela de empresa
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
+
+- Executando operações CRUD
+  - Incluindo um registro na tabela
+  - Incluindo um professor
+  - Atualizando um registro na tabela
+  - Alterando o percentual do INSS
+  - Excluindo um registro da tabela
+  - Excluindo produtos
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
+
+- Consultas com filtros
+  - Selecionando colunas específicas da tabela
+  - Relatório de pacientes
+  - Filtrando registros de campos do tipo texto
+  - Pesquisa no dicionário
+  - Filtrando registros de campos do tipo numérico, data e booleano
+  - Vagas com remuneração alta
+  - Filtrando utilizando operadores E e OU
+  - Apuração de resultado
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
+
+- Trabalhando com relacionamentos
+  - Criando tabela com chave primária
+  - Erro de importação
+  - Criando tabela com chave estrangeira
+  - Departamento do funcionário
+  - Consultas com relacionamentos
+  - Funcionários com departamento
+  - LEFT, RIGHT, CROSS e FULL JOINS
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
+
+- Usando CASCADE
+  - DELETE CASCADE
+  - Exclusão de aluno e turma
+  - UPDATE CASCADE
+  - Atualização de telefone
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
+
+- Avançando com consultas
+  - Ordenando as consultas
+  - Limitando as consultas
+  - Classificação de vestibular
+  - Funções de agregação
+  - Agrupando consultas
+  - Filtrando consultas agrupadas
+  - Realização de evento
+  - Faça como eu fiz
+  - O que aprendemos?
+  - Projeto da aula
+  - Carreira em SQL
+  - Conclusão
 
 ## Índice
 
@@ -35,14 +102,6 @@ Esta jornada destina-se a obter uma introdução às principais funções que po
 
 ---
 
-## Dia 1
+## Apontamentos
 
----
 
-## Seção 1: Isto é um modelo de Índice
-
-Coloque aqui o conteúdo.
-
-## Seção 2: Isto é outro modelo de Índice
-
-Coloque aqui o conteúdo.
