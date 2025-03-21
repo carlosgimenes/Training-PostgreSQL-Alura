@@ -13,13 +13,13 @@ Esta jornada destina-se a obter uma introdução às principais funções que po
 
 Ao final do treinamento deveremos ser capaz de:
 
-- Crie a estrutura de uma tabela com CREATE TABLE
-- Realize consultas com SELECT
-- Adicione dados no banco com o INSERT
-- Atualize e apague dados com UPDATE e DELETE
-- Filtre os seus registros com WHERE
-- Ordene os seus dados com o ORDER BY
-- Junte registros de tabelas com JOIN
+- Criar a estrutura de uma tabela com CREATE TABLE
+- Realizar consultas com SELECT
+- Adicionar dados no banco com o INSERT
+- Atualizar e apaguar dados com UPDATE e DELETE
+- Filtrar os seus registros com WHERE
+- Ordenar os seus dados com o ORDER BY
+- Juntar registros de tabelas com JOIN
 
 ---
 
