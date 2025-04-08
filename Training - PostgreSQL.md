@@ -25,16 +25,16 @@ Ao final do treinamento deveremos ser capaz de:
 
 ## Aulas
 
-- [Primeiros passos com PostgreSQL](01.%20Primeiros%20passos%20com%20PostgreSQL.md)
-  - [Apresentação do curso](01.%20Primeiros%20passos%20com%20PostgreSQL.md#apresentacao-do-curso)
-  - [Ambiente e versões](01.%20Primeiros%20passos%20com%20PostgreSQL.md#ambiente-e-versões)
-  - [Criando um banco de dados](01.%20Primeiros%20passos%20com%20PostgreSQL.md#criando-um-banco-de-dados)
-  - [Criação e exclusão de um banco de dados](01.%20Primeiros%20passos%20com%20PostgreSQL.md#criação-e-exclusão-de-um-banco-de-dados)
-  - [Criando uma tabela](01.%20Primeiros%20passos%20com%20PostgreSQL.md#criando-uma-tabela)
-  - [Tabela de empresa](01.%20Primeiros%20passos%20com%20PostgreSQL.md#tabela-de-empresa)
-  - [Faça como eu fiz](01.%20Primeiros%20passos%20com%20PostgreSQL.md#faça-como-eu-fiz)
-  - [Projeto da aula](01.%20Primeiros%20passos%20com%20PostgreSQL.md#projeto-da-aula)
-  - [O que aprendemos?](01.%20Primeiros%20passos%20com%20PostgreSQL.md#o-que-aprendemos)
+- [Primeiros passos com PostgreSQL](01.Primeiros_passos_com_PostgreSQL.md)
+  - [Apresentação do curso](01.Primeiros_passos_com_PostgreSQL.md#apresentação-ao-curso)
+  - [Ambiente e versões](01.Primeiros_passos_com_PostgreSQL.md#ambiente-e-versões)
+  - [Criando um banco de dados](01.Primeiros_passos_com_PostgreSQL.md#criando-um-banco-de-dados)
+  - [Criação e exclusão de um banco de dados](01.Primeiros_passos_com_PostgreSQL.md#criação-e-exclusão-de-um-banco-de-dados---testando-conhecimento-adquirido)
+  - [Criando uma tabela](01.Primeiros_passos_com_PostgreSQL.md#criando-uma-tabela-no-postgresql)
+  - [Tabela de empresa](01.Primeiros_passos_com_PostgreSQL.md#tabela-de-empresa---testando-conhecimento-adquirido)
+  - [Faça como eu fiz](01.Primeiros_passos_com_PostgreSQL.md#faça-como-eu-fiz)
+  - [Projeto da aula](01.Primeiros_passos_com_PostgreSQL.md#projeto-da-aula)
+  - [O que aprendemos?](01.Primeiros_passos_com_PostgreSQL.md#o-que-aprendemos)
 
 - [Executando operações CRUD](02.%20Executando%20operacoes%20CRUD.md)
   - Incluindo um registro na tabela
