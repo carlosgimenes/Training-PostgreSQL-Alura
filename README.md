@@ -1,4 +1,4 @@
-# Training Alura - PostgreSQL
+# Alura - PostgreSQL: Primeiros passos com SQL
 
 ## Estrutura do Repositório
 
