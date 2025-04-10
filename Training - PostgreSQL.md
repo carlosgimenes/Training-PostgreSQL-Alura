@@ -25,18 +25,18 @@ Ao final do treinamento deveremos ser capaz de:
 
 ## Aulas
 
-- [Primeiros passos com PostgreSQL](01.Primeiros_passos_com_PostgreSQL.md)
-  - [Apresentação do curso](01.Primeiros_passos_com_PostgreSQL.md#apresentação-ao-curso)
-  - [Ambiente e versões](01.Primeiros_passos_com_PostgreSQL.md#ambiente-e-versões)
-  - [Criando um banco de dados](01.Primeiros_passos_com_PostgreSQL.md#criando-um-banco-de-dados)
-  - [Criação e exclusão de um banco de dados](01.Primeiros_passos_com_PostgreSQL.md#criação-e-exclusão-de-um-banco-de-dados---testando-conhecimento-adquirido)
-  - [Criando uma tabela](01.Primeiros_passos_com_PostgreSQL.md#criando-uma-tabela-no-postgresql)
-  - [Tabela de empresa](01.Primeiros_passos_com_PostgreSQL.md#tabela-de-empresa---testando-conhecimento-adquirido)
-  - [Faça como eu fiz](01.Primeiros_passos_com_PostgreSQL.md#faça-como-eu-fiz)
-  - [Projeto da aula](01.Primeiros_passos_com_PostgreSQL.md#projeto-da-aula)
-  - [O que aprendemos?](01.Primeiros_passos_com_PostgreSQL.md#o-que-aprendemos)
+- Primeiros passos com PostgreSQL
+  - Apresentação do curso
+  - Ambiente e versões
+  - Criando um banco de dados
+  - Criação e exclusão de um banco de dados
+  - Criando uma tabela
+  - Tabela de empresa
+  - Faça como eu fiz
+  - Projeto da aula
+  - O que aprendemos?
 
-- [Executando operações CRUD](02.%20Executando%20operacoes%20CRUD.md)
+- Executando operações CRUD
   - Incluindo um registro na tabela
   - Incluindo um professor
   - Atualizando um registro na tabela
@@ -47,7 +47,7 @@ Ao final do treinamento deveremos ser capaz de:
   - Projeto da aula
   - O que aprendemos?
 
-- [Consultas com filtros](03.%20Consultas%20com%20Filtros.md)
+- Consultas com filtros
   - Selecionando colunas específicas da tabela
   - Relatório de pacientes
   - Filtrando registros de campos do tipo texto
@@ -60,7 +60,7 @@ Ao final do treinamento deveremos ser capaz de:
   - Projeto da aula
   - O que aprendemos?
 
-- [Trabalhando com relacionamentos](04.%20Trabalhando%20com%20Relacionamentos.md)
+- Trabalhando com relacionamentos
   - Criando tabela com chave primária
   - Erro de importação
   - Criando tabela com chave estrangeira
@@ -72,7 +72,7 @@ Ao final do treinamento deveremos ser capaz de:
   - Projeto da aula
   - O que aprendemos?
 
-- [Usando CASCADE](05.%20Usando%20CASCADE.md)
+- Usando CASCADE
   - DELETE CASCADE
   - Exclusão de aluno e turma
   - UPDATE CASCADE
@@ -81,7 +81,7 @@ Ao final do treinamento deveremos ser capaz de:
   - Projeto da aula
   - O que aprendemos?
 
-- [Avançando com consultas](06.%20Avancando%20com%20Consultas.md)
+- Avançando com consultas
   - Ordenando as consultas
   - Limitando as consultas
   - Classificação de vestibular
@@ -93,14 +93,13 @@ Ao final do treinamento deveremos ser capaz de:
   - O que aprendemos?
   - Projeto da aula
 
-- [Conclusão](07.%20Conclusao.md)
+- Conclusão
 
 ---
 
 ## Apêndice
 
-- [Apêndice A - Guia de Referência Rápida](08.%20Apendice%20A%20-%20Guia%20referencia%20rapida.md)
-- [Apêndice B - Configuração de Acesso Remoto](09.%20Apendice%20B%20-%20Confguracao%20Acesso%20Remoto.md)
+- Apêndice A - Guia de Referência Rápida
+- Apêndice B - Configuração de Acesso Remoto
 
 ---
-
