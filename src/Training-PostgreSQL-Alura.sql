@@ -16,15 +16,32 @@
 */
 
 -- Testando funcionamento do PostgreSQL
+-- ====================================
 SELECT NOW();
 
+-- Retorno
+/*
+"2025-04-17 14:45:56.584795+00"
+*/
+
 -- Criando o Banco de Dados "alura"
+-- ================================
 CREATE DATABASE alura;
 
 -- Listando os Bancos de Dados
+-- ===========================
 SELECT datname FROM pg_database;
 
+-- Retorno
+/*
+"postgres"
+"template1"
+"template0"
+"alura"
+*/
+
 -- Excluindo o Banco de Dados "alura"
+-- ==================================
 DROP DATABASE alura;
 
 
@@ -59,7 +76,8 @@ timestamp
 
 -- Agora que vimos os principais Tipos de Dados, iremos criar nossa primeira tabela
 
--- Tabela aluno
+-- Criando a Tabela aluno
+-- ======================
 
 CREATE TABLE aluno(
     id SERIAL,
@@ -76,9 +94,11 @@ CREATE TABLE aluno(
 );
 
 -- Listando os dados da Tabela
+-- ===========================
 SELECT * FROM aluno;
 
 -- Excluindo uma Tabela
+-- ====================
 DROP TABLE aluno;
 
 
@@ -113,6 +133,7 @@ Nesta aula, aprendemos:
 */
 
 -- Incluindo um registro na tabela
+-- ===============================
 
 INSERT INTO aluno (
     nome,
@@ -140,9 +161,16 @@ INSERT INTO aluno (
 
 
 -- Visualizando regsitro incluido na tabela
+-- ========================================
 SELECT * FROM aluno;
 
+-- Retorno
+/*
+2	"Diogo"	"12345678901"	"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac dui et nisl vestibulum consequat. Integer vitae magna egestas, finibus libero dapibus, maximus magna. Fusce suscipit mi ut dui vestibulum, non vehicula felis fringilla. Vestibulum eget massa blandit, viverra quam non, convallis libero. Morbi ut nunc ligula. Duis tristique purus augue, nec sodales sem scelerisque dignissim. Sed vel rutrum mi. Nunc accumsan magna quis tempus rhoncus. Duis volutpat nulla a aliquet feugiat. Vestibulum rhoncus mi diam, eu consectetur sapien eleifend in. Donec sed facilisis velit. Duis tempus finibus venenatis. Mauris neque nisl, pulvinar eu volutpat eu, laoreet in massa. Quisque vestibulum eros ac tortor facilisis vulputate. Sed iaculis purus non sem tempus mollis. Curabitur felis lectus, aliquam id nunc ut, congue accumsan tellus."	35	100.50	1.81	true	"1984-08-27"	"17:30:00"	"2020-02-08 12:32:45"
+*/
+
 -- Atualizando um registro na tabela
+-- =================================
 
 /*
 Primeiramente, vamos selecionar os dados da tabela utilizando o SELECT * FROM. É fundamental usar o WHERE para filtrar os registros 
@@ -174,9 +202,11 @@ UPDATE aluno
 WHERE id = 1;
 
 -- Conferindo atualização realizada
+-- ================================
 SELECT * FROM aluno;
 
 -- Excluindo um registro da tabela
+-- ===============================
 
 /*
 Aplicando o DELETE na tabela aluno
@@ -227,6 +257,7 @@ Nesta aula, aprendemos:
 */
 
 -- Selecionando colunas específicas da tabela
+-- ==========================================
 
 /*
 Antes de aprendermos sobre os filtros, precisamos aprender outra coisa importante, que é a seleção de campos específicos do banco de dados.
@@ -262,6 +293,7 @@ INSERT INTO aluno (
 );
 
 -- Conferindo atualização realizada
+-- ================================
 SELECT * FROM aluno;
 
 /*
@@ -273,6 +305,9 @@ SELECT nome,
        idade,
        matriculado_em
     FROM aluno;
+
+-- Utilização de Alias
+-- ===================
 
 /*
 A partir dessa seleção, podemos usar o comando AS, ou seja, um alias, para trocar o nome de exibição dos campos na tabela. Se escrevermos SELECT 
@@ -288,6 +323,7 @@ SELECT nome AS "Nome do Aluno",
     FROM aluno;
 
 -- Filtrando registros de campos do tipo texto
+-- ===========================================
 
 /*
 Começaremos a trabalhar com filtros e, para isso, precisamos incluir mais dados na tabela, que até o momento só tem o usuário "Diogo".
@@ -309,9 +345,83 @@ WHERE nome_do_campo .
 O primeiro filtro que aprenderemos é o "igual", representado pelo símbolo = e usado para pesquisar um texto específico.
 */
 
+SELECT	nome,
+		cpf
+    FROM aluno
+ WHERE nome = 'Diogo
+
+-- Retorno
+/*
+"Diogo"	"12345678901"							
+*/
+
+/*
+Ao executar esse código, notamos que WHERE nome = 'Diogo;' retorna apenas os dados do "Diogo". Se pesquisássemos, por exemplo, 
+WHERE nome = 'Diogo Oliveira' , não acharíamos nenhum resultado, pois o único "Diogo" na nossa tabela não tem sobrenome.
+
+O próximo filtro é o "diferente", usado quando queremos todos os dados que não declaramos. Pode ser representado pelo sinal <> ou 
+pelo sinal != . Então WHERE nome <> 'Diogo' e WHERE nome != 'Diogo' retornam o mesmo resultado, ou seja, todos os registros que 
+não são o "Diogo".
+*/
+
 SELECT *
     FROM aluno
- WHERE nome = 'Diogo';
+ WHERE nome <> 'Diogo';
 
+-- Retorno
+/*
+3	"Vinícius Dias"									
+4	"Nico Steppat"									
+5	"João Roberto"									
+6	"Diego"									
+*/
 
+/*
+Outra forma de filtrar uma informação é utilizando o LIKE que pode ser entendido como "parecido com". Dessa forma, WHERE nome LIKE 'Diogo' 
+pode ser lido como "ONDE nome PARECIDO COM 'Diogo'". Ao utilizarmos o LIKE podemos aplicar dois operadores especiais: o _ (underline) 
+e o % (porcentagem).
 
+Começaremos aprendendo o _ , que significa "qualquer caractere naquela posição", ou seja, a posição que ele ocupa substitui um caractere. 
+Então se pesquisarmos com WHERE nome LIKE '_iogo', os nomes apresentados começarão por qualquer letra, mas terminarão com "iogo". Vejamos 
+outro exemplo.
+*/
+
+SELECT nome,
+		cpf,
+		idade,
+		dinheiro,
+		altura,
+		ativo,
+		data_nascimento,
+		hora_aula,
+		matriculado_em
+    FROM aluno
+ WHERE nome Like 'Di_go';
+
+-- Retorno
+/*
+"Diogo"	"12345678901"	35	100.50	1.81	true	"1984-08-27"	"17:30:00"	"2020-02-08 12:32:45"
+"Diego"								
+*/
+
+/*
+Nesse caso, o filtro ignora o terceiro caractere entre o "Di" e o "go", ou seja, a tabela retornará tanto o "Diego", quanto o "Diogo". 
+Em resumo, o _ , que pode estar no começo, meio ou final de uma palavra, ocupa o espaço específico de um caractere, que será ignorado na busca.
+
+Outra forma de usarmos o _ é com o comando NOT LIKE, ou seja, "não parece com". Portanto, em WHERE nome NOT LIKE 'Di_go' , a tabela apresentará 
+apenas os registros de nomes que não tenham comecem com "Di" e terminem com "go", independentemente do caractere que estiver entre essas sílabas. 
+No caso, todos os nomes que não sejam "Diego" ou "Diogo".
+
+Agora aprenderemos o caractere % , que substitui todos os caracteres até o espaço que ele ocupa. Por exemplo, para recuperar todos os nomes que 
+comecem com "D", usamos o comando:
+*/
+
+SELECT * 
+    FROM aluno
+ WHERE nome LIKE 'D%';
+
+-- Retorno
+/*
+2	"Diogo"	"12345678901"	"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac dui et nisl vestibulum consequat. Integer vitae magna egestas, finibus libero dapibus, maximus magna. Fusce suscipit mi ut dui vestibulum, non vehicula felis fringilla. Vestibulum eget massa blandit, viverra quam non, convallis libero. Morbi ut nunc ligula. Duis tristique purus augue, nec sodales sem scelerisque dignissim. Sed vel rutrum mi. Nunc accumsan magna quis tempus rhoncus. Duis volutpat nulla a aliquet feugiat. Vestibulum rhoncus mi diam, eu consectetur sapien eleifend in. Donec sed facilisis velit. Duis tempus finibus venenatis. Mauris neque nisl, pulvinar eu volutpat eu, laoreet in massa. Quisque vestibulum eros ac tortor facilisis vulputate. Sed iaculis purus non sem tempus mollis. Curabitur felis lectus, aliquam id nunc ut, congue accumsan tellus."	35	100.50	1.81	true	"1984-08-27"	"17:30:00"	"2020-02-08 12:32:45"
+6	"Diego"									
+*/
