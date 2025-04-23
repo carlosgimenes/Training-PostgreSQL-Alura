@@ -425,3 +425,25 @@ SELECT *
 2	"Diogo"	"12345678901"	"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac dui et nisl vestibulum consequat. Integer vitae magna egestas, finibus libero dapibus, maximus magna. Fusce suscipit mi ut dui vestibulum, non vehicula felis fringilla. Vestibulum eget massa blandit, viverra quam non, convallis libero. Morbi ut nunc ligula. Duis tristique purus augue, nec sodales sem scelerisque dignissim. Sed vel rutrum mi. Nunc accumsan magna quis tempus rhoncus. Duis volutpat nulla a aliquet feugiat. Vestibulum rhoncus mi diam, eu consectetur sapien eleifend in. Donec sed facilisis velit. Duis tempus finibus venenatis. Mauris neque nisl, pulvinar eu volutpat eu, laoreet in massa. Quisque vestibulum eros ac tortor facilisis vulputate. Sed iaculis purus non sem tempus mollis. Curabitur felis lectus, aliquam id nunc ut, congue accumsan tellus."	35	100.50	1.81	true	"1984-08-27"	"17:30:00"	"2020-02-08 12:32:45"
 6	"Diego"									
 */
+
+/*
+Novamente aparecem os resultados do "Diogo" e do "Diego", que são os nomes da nossa tabela que começam dom D. Podemos filtrar também pela última 
+letra ao invés da primeira. Por exemplo, para filtrar os nomes terminados em "s", utilizamos o comando WHERE nome LIKE '%s';. 
+Assim aparecerão os dados do "Vinícius Dias". Outra possibilidade é recuperar todos os nomes que tenham espaço:
+*/
+
+SELECT * 
+    FROM aluno
+ WHERE nome LIKE '% %';
+
+-- Retorno
+/*
+3	"Vinícius Dias"									
+4	"Nico Steppat"									
+5	"João Roberto"									
+*/
+
+/*
+Esse filtro ignora quaisquer nomes que estejam antes ou depois do espaço, então os únicos dados que não vão aparecer serão do "Diogo" e do "Diego", 
+porque todos os outros usuários têm nome e sobrenome divididos por espaço. O ``%também pode ser usado entre textos, como%i%a%`.
+*/
