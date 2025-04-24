@@ -1647,7 +1647,1247 @@ relacionados sejam excluídos automaticamente, evitando erros ao deletar dados. 
 verificamos o estado atual do banco de dados:
 */
 
+SELECT * FROM aluno;
+-- Retorno
+/*
+"id"	"nome"
+1		"Diogo"
+2		"Vinícius"
+3		"Nico"
+4		"João"
+*/
 
--- Coming soon
+SELECT * FROM aluno_curso;
+-- Retorno
+/*
+"aluno_id"	"curso_id"
+1			1
+2			1
+2			2
+*/
+
+SELECT * FROM curso;
+-- Retorno
+/*
+"id"	"nome"
+1		"HTML"
+2		"Javascript"
+3		"CSS"
+*/
+
+/*
+Temos quatro alunos na tabela aluno, três cursos na tabela curso e quatro matrículas registradas na tabela aluno_curso. 
+Como não definimos restrições específicas, ao tentar excluir um aluno diretamente, recebemos um erro:
+*/
+
+DELETE FROM aluno WHERE id = 1;
+
+/*
+ERROR:  update or delete on table "aluno" violates foreign key constraint "aluno_curso_aluno_id_fkey" on table "aluno_curso"
+Key (id)=(1) is still referenced from table "aluno_curso". 
+
+SQL state: 23503
+Detail: Key (id)=(1) is still referenced from table "aluno_curso".
+*/
+
+/*
+Isso acontece porque esse aluno está vinculado à tabela aluno_curso, e a restrição padrão ON DELETE RESTRICT impede a 
+exclusão de dados que possuem relações em outras tabelas. Para resolver esse problema, utilizaremos ON DELETE CASCADE, 
+que garante que, ao excluir um registro principal (aluno), todos os seus registros relacionados em aluno_curso sejam 
+apagados automaticamente.
+*/
+
+-- =====================================================
+-- Modificando a chave estrangeira com ON DELETE CASCADE
+-- =====================================================
+/*
+Vamos recriar a tabela aluno_curso com essa funcionalidade. Primeiro, apagamos a versão existente:
+*/
+
+DROP TABLE aluno_curso;
+
+/*
+Agora, criamos a nova estrutura incluindo ON DELETE CASCADE na chave estrangeira que faz referência à tabela aluno:
+*/
+
+CREATE TABLE aluno_curso (
+    aluno_id INTEGER,
+    curso_id INTEGER,
+    PRIMARY KEY (aluno_id, curso_id),
+
+    FOREIGN KEY (aluno_id)
+        REFERENCES aluno (id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (curso_id)
+        REFERENCES curso (id)
+);
+
+-- =======================
+-- Testando DELETE CASCADE
+-- =======================
+
+-- Agora, registramos novas matrículas para testar a funcionalidade:
+
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (1,1);
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (2,1);
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (3,1);
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (1,3);
+
+-- Podemos verificar as matrículas com a consulta JOIN:
+
+SELECT
+	ALUNO.NOME AS "Nome do Aluno",
+	CURSO.NOME AS "Nome do Curso"
+FROM
+	ALUNO
+	JOIN ALUNO_CURSO ON ALUNO_CURSO.ALUNO_ID = ALUNO.ID
+	JOIN CURSO ON CURSO.ID = ALUNO_CURSO.CURSO_ID;
+
+-- Retorno
+/*
+"Nome do Aluno"		"Nome do Curso"
+"Diogo"				"HTML"
+"Vinícius"			"HTML"
+"Nico"				"HTML"
+"Diogo"				"CSS"
+*/
+
+-- Agora, excluímos o aluno id = 1:
+
+DELETE FROM aluno WHERE id = 1;
+
+/*
+Desta vez, ao invés de um erro, recebemos uma mensagem de sucesso. Para confirmar que a exclusão ocorreu corretamente, 
+verificamos novamente as tabelas:
+*/
+
+SELECT * FROM aluno; -- O aluno "Diogo" foi excluído
+-- Retorno
+/*
+"id"	"nome"
+2		"Vinícius"
+3		"Nico"
+4		"João"
+*/
+
+SELECT * FROM aluno_curso; -- Suas matrículas também foram removidas
+-- Retorno
+/*
+"aluno_id"	"curso_id"
+2			1
+3			1
+*/
+
+-- Todos os registros relacionados ao aluno id = 1 foram apagados automaticamente.
+
+/*
+Conclusão
+=========
+Nesta aula, vimos como ON DELETE CASCADE facilita a manutenção do banco de dados, garantindo que, ao excluir um registro 
+principal, seus dados relacionados também sejam removidos. Isso evita inconsistências e permite um gerenciamento mais 
+eficiente.
+
+Na próxima aula, aprenderemos como aplicar esse mesmo conceito com UPDATE CASCADE, garantindo que alterações feitas em 
+registros principais sejam propagadas para tabelas relacionadas.
+*/
+
+-- ==============
+-- UPDATE CASCADE
+-- ==============
+/*
+Agora que entendemos DELETE CASCADE, aprenderemos ON UPDATE CASCADE, que garante que alterações feitas em registros 
+principais também sejam refletidas nas tabelas relacionadas. Sem essa opção, tentativas de modificar valores em colunas 
+que possuem chaves estrangeiras podem resultar em erros devido à restrição de integridade referencial.
+*/
+
+-- O problema ao atualizar chaves primárias
+-- ========================================
+
+-- Vamos tentar alterar o id do aluno Vinícius na tabela aluno:
+
+UPDATE aluno
+    SET id = 10
+    WHERE id = 2;
+
+-- Retorno
+/*
+ERROR:  update or delete on table "aluno" violates foreign key constraint "aluno_curso_aluno_id_fkey" on table "aluno_curso"
+Key (id)=(2) is still referenced from table "aluno_curso". 
+
+SQL state: 23503
+Detail: Key (id)=(2) is still referenced from table "aluno_curso".
+*/
+
+/*
+Esse comando solicita ao banco de dados que atualize o id = 2 para id = 10, mas retorna um erro. Isso ocorre porque esse 
+aluno possui registros relacionados na tabela aluno_curso, e a chave estrangeira impede a alteração para evitar 
+inconsistências.
+*/
+
+-- Se tentarmos modificar o id do João, que não possui matrículas associadas, o comando será executado com sucesso:
+
+UPDATE aluno
+    SET id = 20
+    WHERE id = 4;
+
+-- Retorno
+/*
+UPDATE 1
+
+Query returned successfully in 147 msec.
+*/
+
+-- Para permitir a atualização de registros vinculados, precisamos modificar nossa chave estrangeira para incluir 
+-- ON UPDATE CASCADE.
+
+-- =====================================================
+-- Modificando a chave estrangeira com ON UPDATE CASCADE
+-- =====================================================
+
+-- Primeiro, apagamos a tabela aluno_curso para recriá-la com a nova configuração:
+
+DROP TABLE aluno_curso;
+
+-- Agora, adicionamos ON UPDATE CASCADE na chave estrangeira que referencia a tabela aluno:
+
+CREATE TABLE aluno_curso (
+    aluno_id INTEGER,
+    curso_id INTEGER,
+    PRIMARY KEY (aluno_id, curso_id),
+
+    FOREIGN KEY (aluno_id)
+        REFERENCES aluno (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    FOREIGN KEY (curso_id)
+        REFERENCES curso (id)
+);
+
+-- =======================
+-- Testando UPDATE CASCADE
+-- =======================
+
+/*
+Com a tabela recriada, registramos as matrículas novamente, tomando cuidado para não incluir o aluno Diogo, que foi 
+excluído anteriormente:
+*/
+
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (2,1);
+INSERT INTO aluno_curso (aluno_id, curso_id) VALUES (3,1);
+
+-- Para visualizar as matrículas e os IDs dos alunos e cursos, usamos:
+
+SELECT 
+       aluno.id AS aluno_id,
+       aluno.nome AS "Nome do Aluno",
+       curso.id AS curso_id,
+       curso.nome AS "Nome do Curso"
+  FROM aluno
+  JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+  JOIN curso ON curso.id = aluno_curso.curso_id;
+
+-- Retorno
+/*
+"aluno_id"	"Nome do Aluno"	"curso_id"	"Nome do Curso"
+2			"Vinícius"		1			"HTML"
+3			"Nico"			1			"HTML"
+*/
+
+-- Agora, tentamos novamente atualizar o id do aluno Vinícius:
+
+UPDATE aluno
+    SET id = 10
+    WHERE id = 2;
+
+-- Desta vez, o comando é executado com sucesso. Ao rodar a consulta anterior, vemos que o id do Vinícius mudou para 10. 
+
+SELECT 
+       aluno.id AS aluno_id,
+       aluno.nome AS "Nome do Aluno",
+       curso.id AS curso_id,
+       curso.nome AS "Nome do Curso"
+  FROM aluno
+  JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+  JOIN curso ON curso.id = aluno_curso.curso_id;
+
+-- Retorno
+/*
+"aluno_id"	"Nome do Aluno"	"curso_id"	"Nome do Curso"
+3			"Nico"			1			"HTML"
+10			"Vinícius"		1			"HTML"
+*/
+
+-- Verificando a tabela aluno_curso:
+
+SELECT * FROM aluno_curso;
+
+-- Retorno
+/*
+"aluno_id"	"curso_id"
+3			1
+10			1
+*/
+
+/*
+Percebemos que a atualização do id também foi refletida na tabela aluno_curso, garantindo que os registros permaneçam 
+consistentes em ambas as tabelas.
+*/
+
+/*
+Conclusão
+=========
+Com ON UPDATE CASCADE, qualquer modificação em uma chave primária na tabela aluno é automaticamente propagada para as 
+tabelas relacionadas, evitando problemas de integridade e permitindo um gerenciamento mais eficiente dos dados.
+
+Na próxima aula, aprenderemos como lidar com alterações nas consultas e explorar formas avançadas de manipulação de dados.
+*/
 
 
+/*
+================
+O que aprendemos
+================
+
+Nesta aula, aprendemos:
+
+    # Como funcionam as restrições de chave estrangeira
+    # A diferença entre RESTRICT e CASCADE
+    # Como aplicar tipos diferentes de restrições de chave estrangeira no DELETE
+    # RESTRICT
+    # CASCADE
+    # A aplicar tipos diferentes de restrições de chave estrangeira no UPDATE
+    # RESTRICT
+    # CASCADE
+*/
+
+
+/*
+-------------------------------------------------------------------------------------------------------------------------
+	Módulo 6 - Avançando com Consultas
+-------------------------------------------------------------------------------------------------------------------------
+*/
+
+-- ======================
+-- Ordenando as consultas
+-- ======================
+
+-- Nesta aula, aprenderemos como organizar consultas SQL utilizando ORDER BY. Essa cláusula é essencial para tornar a 
+-- apresentação dos resultados mais clara, especialmente em tabelas grandes. Para isso, criaremos uma tabela simulando o 
+-- cadastro de funcionários:
+
+CREATE TABLE funcionarios(
+    id SERIAL PRIMARY KEY,
+    matricula VARCHAR(10),
+    nome VARCHAR(255),
+    sobrenome VARCHAR(255)
+);
+
+-- Agora, inserimos alguns registros:
+
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M001', 'Diogo', 'Mascarenhas');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M002', 'Vinícius', 'Dias');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M003', 'Nico', 'Steppat');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M004', 'João', 'Roberto');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M005', 'Diogo', 'Mascarenhas');
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M006', 'Alberto', 'Martins');
+
+-- Executando SELECT * FROM funcionarios;, confirmamos que os registros foram incluídos corretamente.
+
+SELECT * FROM funcionarios;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"		"sobrenome"
+1		"M001"		"Diogo"		"Mascarenhas"
+2		"M002"		"Vinícius"	"Dias"
+3		"M003"		"Nico"		"Steppat"
+4		"M004"		"João"		"Roberto"
+5		"M005"		"Diogo"		"Mascarenhas"
+6		"M006"		"Alberto"	"Martins"
+*/
+
+-- ==========================================
+-- Usando ORDER BY para ordenar os resultados
+-- ==========================================
+
+-- O comando ORDER BY nos permite definir a ordem em que os resultados serão exibidos. Por padrão, a ordenação ocorre em 
+-- ordem crescente:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY nome;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"		"sobrenome"
+6		"M006"		"Alberto"	"Martins"
+1		"M001"		"Diogo"		"Mascarenhas"
+5		"M005"		"Diogo"		"Mascarenhas"
+4		"M004"		"João"		"Roberto"
+3		"M003"		"Nico"		"Steppat"
+2		"M002"		"Vinícius"	"Dias"
+*/
+
+-- Caso queiramos ordenar os resultados em ordem decrescente, utilizamos DESC:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY nome DESC;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	"sobrenome"
+2	"M002"	"Vinícius"	"Dias"
+3	"M003"	"Nico"	"Steppat"
+4	"M004"	"João"	"Roberto"
+1	"M001"	"Diogo"	"Mascarenhas"
+5	"M005"	"Diogo"	"Mascarenhas"
+6	"M006"	"Alberto"	"Martins"
+*/
+
+-- Também podemos ordenar por múltiplas colunas. Por exemplo, se quisermos organizar os registros primeiro pelo nome 
+-- e depois pela matricula, usamos:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY nome, matricula;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"		"sobrenome"
+6		"M006"		"Alberto"	"Martins"
+1		"M001"		"Diogo"		"Mascarenhas"
+5		"M005"		"Diogo"		"Mascarenhas"
+4		"M004"		"João"		"Roberto"
+3		"M003"		"Nico"		"Steppat"
+2		"M002"		"Vinícius"	"Dias"
+*/
+
+-- Aqui, os registros serão ordenados pelo nome de forma crescente e, em casos de nomes repetidos, a matrícula definirá 
+-- a ordem.
+
+-- Para inverter a ordem da matrícula, aplicamos DESC somente a ela:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY nome, matricula DESC;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"		"sobrenome"
+6		"M006"		"Alberto"	"Martins"
+5		"M005"		"Diogo"		"Mascarenhas"
+1		"M001"		"Diogo"		"Mascarenhas"
+4		"M004"		"João"		"Roberto"
+3		"M003"		"Nico"		"Steppat"
+2		"M002"		"Vinícius"	"Dias"
+*/
+
+-- ===============================
+-- Ordenação por posição da coluna
+-- ===============================
+/*
+Outra forma de organizar os registros é usando a posição da coluna ao invés do seu nome. Na nossa tabela:
+
+    id → posição 1
+    matricula → posição 2
+    nome → posição 3
+    sobrenome → posição 4
+
+*/
+
+-- Podemos ordenar pela quarta coluna (sobrenome) informando sua posição:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY 4;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+2	    "M002"	    "Vinícius"	"Dias"
+6	    "M006"	    "Alberto"	"Martins"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+4	    "M004"	    "João"	    "Roberto"
+3	    "M003"	    "Nico"	    "Steppat"
+*/
+
+-- Se quisermos organizar por múltiplas colunas, como nome, sobrenome e matricula, usamos:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY 3, 4, 2;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+6	    "M006"	    "Alberto"	"Martins"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+4	    "M004"	    "João"	    "Roberto"
+3	    "M003"	    "Nico"	    "Steppat"
+2	    "M002"	    "Vinícius"	"Dias"
+*/
+
+-- Isso gera uma ordenação pelos nomes primeiro, depois pelos sobrenomes e, por último, pelas matrículas.
+
+-- Agora, adicionamos um novo registro para ver a ordenação em ação:
+
+INSERT INTO funcionarios (matricula, nome, sobrenome) VALUES ('M007', 'Diogo', 'Oliveira');
+
+-- Executamos:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY 3, 4, 2;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+6	    "M006"	    "Alberto"	"Martins"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+7	    "M007"	    "Diogo"	    "Oliveira"
+4	    "M004"	    "João"	    "Roberto"
+3	    "M003"	    "Nico"	    "Steppat"
+2	    "M002"	    "Vinícius"	"Dias"
+*/
+
+-- Aqui, os registros com o nome "Diogo" aparecem juntos, mas, como o sobrenome "Mascarenhas" vem antes de "Oliveira" 
+-- alfabeticamente, ele aparece primeiro.
+
+-- ======================================================
+-- Evitando Ambiguidade ao Ordenar Colunas Compartilhadas
+-- ======================================================
+
+-- Ao trabalhar com JOIN, pode haver campos com o mesmo nome em diferentes tabelas. Para evitar erros, especificamos o 
+-- nome da tabela ao ordenar:
+
+SELECT 
+       aluno.id AS aluno_id,
+       aluno.nome AS "Nome do Aluno",
+       curso.id AS curso_id,
+       curso.nome AS "Nome do Curso"
+  FROM aluno
+  JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+  JOIN curso ON curso.id = aluno_curso.curso_id
+  ORDER BY aluno.nome;
+
+-- Retorno
+/*
+"aluno_id"	"Nome do Aluno"	"curso_id"	"Nome do Curso"
+3	        "Nico"	        1	        "HTML"
+10	        "Vinícius"	    1	        "HTML"
+*/
+
+-- Esse comando ordena os registros pelo nome do aluno. Se quisermos organizá-los pelo nome do curso primeiro, fazemos:
+-- ORDER BY curso.nome, aluno.nome;
+
+SELECT 
+       aluno.id AS aluno_id,
+       aluno.nome AS "Nome do Aluno",
+       curso.id AS curso_id,
+       curso.nome AS "Nome do Curso"
+  FROM aluno
+  JOIN aluno_curso ON aluno_curso.aluno_id = aluno.id
+  JOIN curso ON curso.id = aluno_curso.curso_id
+  ORDER BY curso.nome, aluno.nome;
+
+-- Retorno
+/*
+"aluno_id"	"Nome do Aluno"	"curso_id"	"Nome do Curso"
+3	"Nico"	1	"HTML"
+10	"Vinícius"	1	"HTML"
+*/
+
+-- Agora, os cursos aparecem em ordem crescente, e dentro de cada curso os alunos estão ordenados alfabeticamente.
+
+-- ======================
+-- Limitando as consultas
+-- ======================
+
+-- Quando uma tabela contém muitos registros, podemos limitar a quantidade de resultados exibidos com a cláusula LIMIT. 
+-- Isso torna as buscas mais eficientes e evita retornos excessivos.
+
+-- Para exibir apenas os cinco primeiros registros, utilizamos:
+
+SELECT * 
+  FROM funcionarios
+  LIMIT 5;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+2	    "M002"	    "Vinícius"	"Dias"
+3	    "M003"	    "Nico"	    "Steppat"
+4	    "M004"	    "João"	    "Roberto"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+*/
+
+-- Para ordenar antes de limitar os resultados:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY nome
+  LIMIT 5;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+6	    "M006"	    "Alberto"	"Martins"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+7	    "M007"	    "Diogo"	    "Oliveira"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+4	    "M004"	    "João"	    "Roberto"
+*/
+
+-- ============================
+-- Pulando registros com OFFSET
+-- ============================
+
+-- Se quisermos exibir resultados após ignorar um certo número de linhas, usamos OFFSET. No exemplo abaixo, pulamos o 
+-- primeiro registro e exibimos os cinco seguintes:
+
+SELECT * 
+  FROM funcionarios
+  ORDER BY id
+  LIMIT 5
+  OFFSET 1;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+2	    "M002"	    "Vinícius"	"Dias"
+3	    "M003"	    "Nico"	    "Steppat"
+4	    "M004"	    "João"	    "Roberto"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+6	    "M006"	    "Alberto"	"Martins"
+*/
+
+-- Podemos testar outras combinações:
+
+-- OFFSET 2; -- Exibe registros a partir do ID 3
+SELECT * 
+  FROM funcionarios
+  ORDER BY id
+  LIMIT 5
+  OFFSET 2;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+3	    "M003"	    "Nico"	    "Steppat"
+4	    "M004"	    "João"	    "Roberto"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+6	    "M006"	    "Alberto"	"Martins"
+7	    "M007"	    "Diogo"	    "Oliveira"
+*/
+
+-- OFFSET 3; -- Exibe registros a partir do ID 4
+SELECT * 
+  FROM funcionarios
+  ORDER BY id
+  LIMIT 5
+  OFFSET 3;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+4	    "M004"	    "João"	    "Roberto"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+6	    "M006"	    "Alberto"	"Martins"
+7	    "M007"	    "Diogo"	    "Oliveira"
+*/
+
+-- Caso OFFSET ultrapasse o número total de registros disponíveis, a consulta pode retornar um conjunto menor de resultados.
+
+/*
+-- =========
+-- Conclusão
+-- =========
+Os comandos ORDER BY, LIMIT e OFFSET são essenciais para otimizar consultas SQL. Eles permitem organizar os resultados, 
+limitar sua quantidade e definir quais registros devem ser exibidos. Na próxima aula, aprofundaremos outros aspectos para 
+manipulação avançada dos dados.
+*/
+
+-- ====================
+-- Funções de Agregação
+-- ====================
+
+-- Nesta aula, aprenderemos sobre as funções de agregação, que permitem calcular estatísticas sobre conjuntos de registros, 
+-- como contagens, somas e médias. Essas funções são essenciais para gerar relatórios e análises de dados.
+
+-- Os comandos de agregação mais comuns são:
+
+-- COUNT - Conta a quantidade de registros
+-- SUM   - Calcula a soma dos valores
+-- MAX   - Retorna o maior valor de um conjunto
+-- MIN   - Retorna o menor valor de um conjunto
+-- AVG   - Calcula a média dos valores
+
+-- =================================
+-- Contagem de registros com COUNT()
+-- =================================
+
+-- A função COUNT() retorna o número total de registros de uma tabela. Ela pode contar registros específicos ou usar 
+-- COUNT(*) para incluir todas as linhas, independentemente de valores NULL.
+
+SELECT COUNT(*) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"count"
+7
+*/
+
+-- Se quisermos contar apenas os registros onde id não seja NULL, utilizamos:
+
+SELECT COUNT(id) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"count"
+7
+*/
+
+-- No caso da nossa tabela, ambas as consultas retornam 7, porque todos os registros possuem valores preenchidos em id.
+
+-- =================================================
+-- Obtendo valores máximo e mínimo com MAX() e MIN()
+-- =================================================
+
+-- Podemos encontrar o maior valor de um conjunto de registros utilizando MAX():
+
+SELECT MAX(id) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"max"
+7
+*/
+
+-- Esse comando retorna 7, pois é o maior id registrado. Da mesma forma, para obter o menor valor:
+
+SELECT MIN(id) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"min"
+1
+*/
+
+-- O retorno será 1, pois esse é o menor id na tabela.
+
+-- ======================================================
+-- Calculando médias com AVG() e arredondando com ROUND()
+-- ======================================================
+
+-- A função AVG() retorna a média dos valores de uma coluna:
+
+SELECT AVG(id) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"avg"
+4.0000000000000000
+*/
+
+-- O resultado será 4, obtido dividindo a soma total (28) pelo número de registros (7).
+
+-- Por padrão, o retorno da média pode incluir várias casas decimais. Para controlar essa precisão, usamos ROUND
+
+SELECT ROUND(AVG(id), 2) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"round"
+4.00
+*/
+
+-- Esse comando arredonda a média para duas casas decimais. Se quisermos um valor inteiro, usamos:
+
+SELECT ROUND(AVG(id), 0) 
+  FROM funcionarios;
+
+-- Retorno
+/*
+"round"
+4
+*/
+
+-- Esse comando retorna 4, arredondando para o número inteiro mais próximo.
+
+-- =============================================================
+-- Exibindo múltiplas funções de agregação em uma única consulta
+-- =============================================================
+
+-- Podemos utilizar várias funções de agregação ao mesmo tempo para obter um conjunto completo de estatísticas:
+
+SELECT COUNT(id) AS total_registros,
+       SUM(id) AS soma_total,
+       MAX(id) AS maior_id,
+       MIN(id) AS menor_id,
+       ROUND(AVG(id), 0) AS media_id
+  FROM funcionarios;
+
+-- Retorno
+/*
+"total_registros"	"soma_total"	"maior_id"	"menor_id"	"media_id"
+7	                28	          7	          1	          4
+*/
+
+-- Essa consulta retorna um único registro contendo todas essas informações agregadas.
+
+/*
+=========
+Conclusão
+=========
+As funções de agregação permitem realizar cálculos estatísticos sobre conjuntos de registros, tornando as consultas mais 
+poderosas para análise de dados. Agora que entendemos como calcular somas, médias, contagens e máximos/mínimos, na próxima 
+aula exploraremos GROUP BY, que nos permitirá agrupar os resultados em categorias.
+*/
+
+-- ===================
+-- Agrupando Consultas
+-- ===================
+
+-- Nesta aula, aprenderemos como agrupar registros em consultas para organizar os dados de maneira mais eficiente. Esse 
+-- processo nos permite evitar duplicatas e aplicar funções de agregação sobre grupos de registros.
+
+/*
+Existem dois comandos principais para agrupamento:
+
+    DISTINCT → Remove valores duplicados, listando apenas ocorrências únicas de um campo.
+    GROUP BY → Agrupa registros semelhantes para aplicar funções de agregação, como COUNT() ou SUM().
+*/
+
+-- =================================
+-- Removendo duplicatas com DISTINCT
+-- =================================
+
+-- Vamos começar verificando os registros da tabela funcionarios:
+
+SELECT * FROM funcionarios;
+
+-- Retorno
+/*
+"id"	"matricula"	"nome"	    "sobrenome"
+1	    "M001"	    "Diogo"	    "Mascarenhas"
+2	    "M002"	    "Vinícius"	"Dias"
+3	    "M003"	    "Nico"	    "Steppat"
+4	    "M004"	    "João"	    "Roberto"
+5	    "M005"	    "Diogo"	    "Mascarenhas"
+6	    "M006"	    "Alberto"	  "Martins"
+7	    "M007"	    "Diogo"	    "Oliveira"
+*/
+
+-- Essa consulta retorna múltiplos nomes, incluindo três registros para "Diogo". Para listar os nomes únicos sem 
+-- repetições, usamos DISTINCT:
+
+SELECT DISTINCT nome
+  FROM funcionarios
+  ORDER BY nome;
+
+-- Retorno
+/*
+"nome"
+"Alberto"
+"Diogo"
+"João"
+"Nico"
+"Vinícius"
+*/
+
+-- Essa consulta retorna "Diogo" apenas uma vez.
+
+-- Se adicionarmos o sobrenome ao DISTINCT, o agrupamento será baseado em ambos os campos:
+
+SELECT DISTINCT nome, sobrenome
+  FROM funcionarios
+  ORDER BY nome;
+
+-- Retorno
+/*
+"nome"	    "sobrenome"
+"Alberto"	  "Martins"
+"Diogo"	    "Mascarenhas"
+"Diogo"	    "Oliveira"
+"João"	    "Roberto"
+"Nico"	    "Steppat"
+"Vinícius"	"Dias"
+*/
+
+-- Agora, "Diogo Mascarenhas" e "Diogo Oliveira" aparecem separadamente, pois o sobrenome faz parte do critério de 
+-- distinção.
+
+-- =========================================
+-- Contando registros agrupados com GROUP BY
+-- =========================================
+
+-- Agora queremos contar quantas vezes cada nome aparece. Se tentarmos usar COUNT(*) com DISTINCT, receberemos um erro:
+
+SELECT DISTINCT
+	NOME,
+	SOBRENOME,
+	COUNT(*)
+FROM
+	FUNCIONARIOS
+ORDER BY
+	NOME;
+
+-- Retorno
+/*
+ERROR:  column "funcionarios.nome" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 2:  NOME,
+         ^ 
+
+SQL state: 42803
+Character: 18
+*/
+
+-- Isso ocorre porque COUNT() requer um agrupamento explícito. Para corrigir, usamos GROUP BY:
+
+SELECT
+	NOME,
+	SOBRENOME,
+	COUNT(*)
+FROM
+	FUNCIONARIOS
+GROUP BY
+	NOME,
+	SOBRENOME
+ORDER BY
+	NOME;
+
+-- Retorno
+/*
+"nome"	    "sobrenome"	  "count"
+"Alberto"	"Martins"	    1
+"Diogo"	    "Mascarenhas"	2
+"Diogo"	    "Oliveira"	  	1
+"João"	    "Roberto"	    1
+"Nico"	    "Steppat"	    1
+"Vinícius"	"Dias"	      	1
+*/
+
+-- Essa consulta retorna a quantidade de registros para cada nome e sobrenome combinados.
+
+-- Também podemos utilizar a posição da coluna no GROUP BY: 
+
+SELECT nome, sobrenome, COUNT(*)
+  FROM funcionarios
+  GROUP BY 1, 2
+  ORDER BY 1;
+
+-- Retorno
+/*
+"nome"	    "sobrenome"	  "count"
+"Alberto"	"Martins"	    1
+"Diogo"	    "Mascarenhas"	2
+"Diogo"	    "Oliveira"	  	1
+"João"	    "Roberto"	    1
+"Nico"	    "Steppat"	    1
+"Vinícius"	"Dias"	      	1
+*/
+
+-- ATENÇÃO: Embora funcione, essa abordagem pode tornar consultas grandes mais difíceis de interpretar.
+
+-- ============================
+-- Agrupando registros com JOIN
+-- ============================
+
+-- Agora, aplicamos GROUP BY para contar o número de alunos em cada curso. Primeiro, listamos as matrículas existentes:
+
+SELECT *
+    FROM aluno
+    JOIN aluno_curso ON aluno.id = aluno_curso.aluno_id
+    JOIN curso ON curso.id = aluno_curso.curso_id;
+
+-- Retorno
+/*
+"id"	"nome"		"aluno_id"	"curso_id"	"id-2"	"nome-2"
+3		"Nico"		3			1			1		"HTML"
+10		"Vinícius"	10			1			1		"HTML"
+*/
+
+-- Essa consulta exibe alunos e cursos vinculados. Agora, agrupamos os cursos e contamos quantos alunos estão matriculados 
+-- em cada um:
+
+SELECT curso.nome, COUNT(aluno.id)
+    FROM aluno
+    JOIN aluno_curso ON aluno.id = aluno_curso.aluno_id
+    JOIN curso ON curso.id = aluno_curso.curso_id
+    GROUP BY curso.nome
+    ORDER BY curso.nome;
+
+-- Retorno
+/*
+"nome"	"count"
+"HTML"	2
+*/
+
+/*
+=========
+Conclusão
+=========
+As funções DISTINCT e GROUP BY são essenciais para organizar consultas e evitar duplicatas. DISTINCT remove valores 
+repetidos, enquanto GROUP BY permite aplicar funções de agregação aos grupos de registros.
+
+Agora que entendemos como agrupar consultas, na próxima aula exploraremos formas avançadas de manipulação de dados!
+*/
+
+-- =============================
+-- Filtrando Consultas Agrupadas
+-- =============================
+
+-- Nesta aula, aprenderemos a filtrar consultas que envolvem agrupamentos. Quando utilizamos GROUP BY, o filtro padrão 
+-- WHERE não pode ser aplicado diretamente sobre funções agregadas, pois ele atua antes da agregação. Para isso, utilizamos 
+-- HAVING, que permite filtrar os registros após a agregação.
+
+-- Verificando informações antes de filtrar
+-- ========================================
+
+-- Antes de começarmos a filtrar dados, verificamos as tabelas relacionadas para entender como os registros estão 
+-- organizados:
+
+SELECT * FROM aluno;
+-- Retorno
+/*
+"id"	"nome"
+3		"Nico"
+20		"João"
+10		"Vinícius"
+*/
+
+SELECT * FROM aluno_curso;
+-- Retorno
+/*
+"aluno_id"	"curso_id"
+3			1
+10			1
+*/
+
+SELECT * FROM curso;
+-- Retorno
+/*
+"id"	"nome"
+1		"HTML"
+2		"Javascript"
+3		"CSS"
+*/
+
+-- Isso nos mostra os alunos cadastrados, as matrículas existentes e os cursos disponíveis.
+
+-- Agora, queremos identificar os cursos sem alunos matriculados. Primeiro, listamos todos os cursos, independentemente 
+-- de terem alunos ou não:
+
+SELECT *
+    FROM curso
+    LEFT JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+    LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id;
+
+-- Retorno
+/*
+"id"	"nome"	      "aluno_id"	"curso_id"	"id-2"	"nome-2"
+1	    "HTML"	      3	          	1	          3	    "Nico"
+1	    "HTML"	      10	        1	          10	"Vinícius"
+2	    "Javascript"				
+3	    "CSS"				
+*/
+
+-- Nos resultados, constatamos que o curso de Javascript não tem alunos matriculados.
+
+-- =========================================
+-- Filtrando cursos por quantidade de alunos
+-- =========================================
+
+-- Para exibir a quantidade de alunos em cada curso, utilizamos COUNT():
+
+SELECT curso.nome,
+       COUNT(aluno.id)
+  FROM curso
+  LEFT JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+  LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id
+  GROUP BY curso.nome;
+
+-- Retorno
+/*
+"nome"			"count"
+"Javascript"	0
+"CSS"			0
+"HTML"			2
+*/
+
+-- Agora, queremos filtrar os cursos que não têm alunos. Podemos tentar WHERE, mas isso causará um erro:
+
+SELECT curso.nome,
+       COUNT(aluno.id)
+  FROM curso
+  LEFT JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+  LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id
+  WHERE COUNT(aluno.id) = 0
+  GROUP BY curso.nome;
+
+-- Retorno
+/*
+ERROR:  aggregate functions are not allowed in WHERE
+LINE 6:   WHERE COUNT(aluno.id) = 0 -- ERRO!
+                ^ 
+
+SQL state: 42803
+Character: 176
+*/
+
+-- O erro ocorre porque WHERE não pode ser usado para filtrar funções agregadas como COUNT(). Para corrigir isso, usamos 
+-- HAVING:
+
+SELECT curso.nome,
+       COUNT(aluno.id)
+  FROM curso
+  LEFT JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+  LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id
+  GROUP BY curso.nome
+  HAVING COUNT(aluno.id) = 0;
+
+-- Retorno
+/*
+"nome"			"count"
+"Javascript"	0
+"CSS"			0
+*/
+
+-- Agora, o curso de Javascript é exibido corretamente, mostrando que ele não tem alunos.
+
+-- Se quisermos listar apenas os cursos com alunos, alteramos o operador = para >:
+-- HAVING COUNT(aluno.id) > 0;
+
+SELECT curso.nome,
+       COUNT(aluno.id)
+  FROM curso
+  LEFT JOIN aluno_curso ON aluno_curso.curso_id = curso.id
+  LEFT JOIN aluno ON aluno.id = aluno_curso.aluno_id
+  GROUP BY curso.nome
+  HAVING COUNT(aluno.id) > 0;
+
+-- Retorno
+/*
+"nome"	"count"
+"HTML"	2
+*/
+
+-- Isso retorna apenas o cursos HTML.
+
+-- ===========================================
+-- Filtrando funcionários com nomes duplicados
+-- ===========================================
+
+-- Vamos agora aplicar HAVING na tabela funcionarios. Se quisermos listar funcionários cujos nomes aparecem mais de uma 
+-- vez, utilizamos:
+
+SELECT nome
+  FROM funcionarios
+  GROUP BY nome
+  HAVING COUNT(id) > 1;
+
+-- Retorno
+/*
+"nome"
+"Diogo"
+*/
+
+-- O resultado mostra apenas os nomes que possuem mais de um registro. Para saber quantas vezes cada nome se repete, usamos
+-- COUNT(id):
+
+SELECT nome,
+       COUNT(id)
+  FROM funcionarios
+  GROUP BY nome
+  HAVING COUNT(id) > 1;
+
+-- Retorno
+/*
+"nome"	"count"
+"Diogo"	3
+*/
+
+-- O retorno indica que "Diogo" aparece três vezes.
+
+-- Para filtrar apenas os funcionários com nomes únicos, alteramos > para =: HAVING COUNT(id) = 1;
+
+SELECT nome,
+       COUNT(id)
+  FROM funcionarios
+  GROUP BY nome
+  HAVING COUNT(id) = 1;
+
+-- Retorno
+/*
+"nome"		"count"
+"Nico"		1
+"João"		1
+"Vinícius"	1
+"Alberto"	1
+*/
+
+/*
+=========
+Conclusão
+=========
+Nesta aula, aprendemos que:
+
+    WHERE filtra antes do agrupamento e só pode ser usado em colunas individuais.
+    HAVING filtra após o agrupamento e permite filtrar por funções agregadas, como COUNT() e AVG().
+    Podemos usar HAVING para identificar registros duplicados ou para excluir grupos específicos.
+*/
+
+
+/*
+================
+O que aprendemos
+================
+Nesta aula, aprendemos:
+
+    # Como ordenar uma consulta
+        # Ordenar utilizando os nomes de campo
+        # Ordenar com mais de um campo
+        # Ordenar por posição do campo
+        # Ordenar por ordem Crescente e Decrescente
+        # Ordenar com campos de tabelas diferentes
+    # Como limitar quantidade e paginar registros de consulta
+        # LIMIT
+        # OFFSET
+    # Como funcionam as funções de agregação
+        # COUNT
+        # SUM
+        # MAX
+        # MIN
+        # AVG
+    # Como funciona a função de arredondamento ROUND
+    # Como funciona o agrupamento de dados
+        # A diferença entre DISTINCT e GROUP BY
+        # Onde utilizar o DISTINCT
+        # Onde utilizar o GROUP BY
+        # Como utilizar o GROUP BY com os nomes de campo
+        # Como utilizar o GROUP BY por posição
+    # Como funcionam os filtros por funções de agrupamento, utilizando HAVING
+        # A diferença entre WHERE e HAVING
+        # Como utilizar o HAVING
+
+*/
+
+
+/*
+-------------------------------------------------------------------------------------------------------------------------
+	FIM
+-------------------------------------------------------------------------------------------------------------------------
+*/
