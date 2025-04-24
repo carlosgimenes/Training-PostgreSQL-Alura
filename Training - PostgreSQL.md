@@ -4,8 +4,8 @@
 ### **Linkedin**: [Perfil do LinkeIn](linkedin.com/in/diogomascarenha)
 ### **Página do curso na Alura**: [Link para página do curso na Alura](https://cursos.alura.com.br/course/introducao-postgresql-primeiros-passos)
 ### **Pasta no Google Drive de apoio ao Treinamento**: Não se aplica
-### **Início**: 19/12/2024
-### **Término**: 
+### **Início**:   19/12/2024
+### **Término**:  24/04/2025
 
 ## A Jornada
 
